@@ -106,33 +106,13 @@ class REPLEnv:
         # Load context into REPL
         self._load_context(context_json, context_str)
     
-    def _load_context(
-        self,
-        context_json: Optional[Dict[str, Any] | List[Any]] = None,
-        context_str: Optional[str] = None
-    ):
-        """Load context as variable in REPL environment."""
+    def _load_context(self, context_json=None, context_str=None):
+        """Load context directly into REPL locals."""
         if context_json is not None:
-            context_path = os.path.join(self.temp_dir, "context.json")
-            with open(context_path, "w") as f:
-                json.dump(context_json, f, indent=2)
-            context_code = (
-                f"import json\n"
-                f"with open(r'{context_path}', 'r') as f:\n"
-                f"    context = json.load(f)\n"
-            )
-            self.code_execution(context_code)
-        
+            self.locals['context'] = context_json
         if context_str is not None:
-            context_path = os.path.join(self.temp_dir, "context.txt")
-            with open(context_path, "w") as f:
-                f.write(context_str)
-            context_code = (
-                f"with open(r'{context_path}', 'r') as f:\n"
-                f"    context = f.read()\n"
-            )
-            self.code_execution(context_code)
-    
+            self.locals['context'] = context_str
+
     def __del__(self):
         """Clean up temporary directory."""
         try:
